@@ -7,6 +7,40 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+// Cache para contar requisições por IP
+const requisicoesPorIp = new Map();
+
+// Lista de IPs bloqueados com tempo de banimento
+const ipsBloqueados = new Map();
+
+// Configurações de mitigação
+const LIMITE_REQ_POR_SEGUNDO = 20;  // máximo de requisições permitidas
+const TEMPO_BAN_MS = 10000;         // 10 segundos de bloqueio
+
+function firewall(req, res, next) {
+    const ip = req.ip;
+
+    if (ipsBloqueados.has(ip) && Date.now() < ipsBloqueados.get(ip)) {
+        return res.status(429).send("IP temporariamente bloqueado");
+    }
+
+    const agora = Date.now();
+    const historico = requisicoesPorIp.get(ip) || [];
+    const novoHistorico = historico.filter(ts => agora - ts < 1000);
+    novoHistorico.push(agora);
+    requisicoesPorIp.set(ip, novoHistorico);
+
+    if (novoHistorico.length > LIMITE_REQ_POR_SEGUNDO) {
+        ipsBloqueados.set(ip, agora + TEMPO_BAN_MS);
+        return res.status(429).send("Muitas requisições - IP bloqueado");
+    }
+
+    next();
+}
+
+// 🔹 Usar middleware antes das rotas
+app.use(firewall);
+
 // Serve a pasta cliente
 app.use(express.static("cliente"));
 
@@ -44,25 +78,43 @@ app.get("/stats", (req, res) => {
     const usoMemoria = ((memoriaTotal - memoriaLivre) / memoriaTotal) * 100;
 
     const totalConexoes = io.engine.clientsCount;
+    const bloqueados = Array.from(ipsBloqueados.keys());
 
     res.json({
         cpu: calcularUsoCpu().toFixed(2),
         memoria: usoMemoria.toFixed(2),
-        conexoes: totalConexoes
+        conexoes: totalConexoes,
+        bloqueados: bloqueados
     });
 });
 
+
 // 🔹 Conexões Socket.IO (ataques)
 io.on("connection", (socket) => {
-    console.log("Nova conexão: ", socket.id);
+    const ip = socket.handshake.address;
+
+    console.log("Nova conexão:", ip, socket.id);
 
     socket.on("ataque", () => {
-        console.log("Ataque recebido de", socket.id);
-        // Aqui você pode simular processamento pesado
+        const agora = Date.now();
+
+        if (ipsBloqueados.has(ip) && Date.now() < ipsBloqueados.get(ip)) {
+            return; // Ignora ataques de IP bloqueado
+        }
+
+        const historico = requisicoesPorIp.get(ip) || [];
+        const novoHistorico = historico.filter(ts => agora - ts < 1000);
+        novoHistorico.push(agora);
+        requisicoesPorIp.set(ip, novoHistorico);
+
+        if (novoHistorico.length > LIMITE_REQ_POR_SEGUNDO) {
+            ipsBloqueados.set(ip, agora + TEMPO_BAN_MS);
+            console.log(`🚫 IP ${ip} bloqueado por 10s`);
+        }
     });
 
     socket.on("disconnect", () => {
-        console.log("Conexão encerrada: ", socket.id);
+        console.log("Conexão encerrada:", socket.id);
     });
 });
 
