@@ -1,42 +1,68 @@
-const os = require("os");
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
+const os = require("os");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-app.use(express.static("cliente")); // Serve HTML e JS do frontend
+// Serve a pasta cliente
+app.use(express.static("cliente"));
+
+// 🔹 Variável global para cálculo da CPU
+let ultimaMedidaCpu = os.cpus();
+
+// 🔹 Função para calcular uso da CPU em tempo real
+function calcularUsoCpu() {
+    const cpusAgora = os.cpus();
+    let usoTotal = 0;
+
+    cpusAgora.forEach((cpu, i) => {
+        const anterior = ultimaMedidaCpu[i];
+        const totalAnterior = Object.values(anterior.times).reduce((acc, tv) => acc + tv, 0);
+        const totalAgora = Object.values(cpu.times).reduce((acc, tv) => acc + tv, 0);
+
+        const idleAnterior = anterior.times.idle;
+        const idleAgora = cpu.times.idle;
+
+        const totalDelta = totalAgora - totalAnterior;
+        const idleDelta = idleAgora - idleAnterior;
+
+        const uso = ((totalDelta - idleDelta) / totalDelta) * 100;
+        usoTotal += uso;
+    });
+
+    ultimaMedidaCpu = cpusAgora;
+    return usoTotal / cpusAgora.length;
+}
+
+// 🔹 Endpoint de métricas
 app.get("/stats", (req, res) => {
     const memoriaTotal = os.totalmem();
     const memoriaLivre = os.freemem();
     const usoMemoria = ((memoriaTotal - memoriaLivre) / memoriaTotal) * 100;
 
-    const cpus = os.cpus();
-    const usoCpu = cpus.map(cpu => {
-        const total = Object.values(cpu.times).reduce((acc, tv) => acc + tv, 0);
-        const idle = cpu.times.idle;
-        return ((total - idle) / total) * 100;
-    });
-    const mediaCpu = usoCpu.reduce((a, b) => a + b) / usoCpu.length;
-
-    // Número de conexões Socket.io ativas
     const totalConexoes = io.engine.clientsCount;
 
     res.json({
-        cpu: mediaCpu.toFixed(2),
+        cpu: calcularUsoCpu().toFixed(2),
         memoria: usoMemoria.toFixed(2),
         conexoes: totalConexoes
     });
 });
 
-
+// 🔹 Conexões Socket.IO (ataques)
 io.on("connection", (socket) => {
     console.log("Nova conexão: ", socket.id);
+
     socket.on("ataque", () => {
-        // Aqui você simula um ataque
         console.log("Ataque recebido de", socket.id);
+        // Aqui você pode simular processamento pesado
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Conexão encerrada: ", socket.id);
     });
 });
 
