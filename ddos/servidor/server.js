@@ -7,47 +7,17 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Cache para contar requisições por IP
-const requisicoesPorIp = new Map();
-
-// Lista de IPs bloqueados com tempo de banimento
-const ipsBloqueados = new Map();
-
-// Configurações de mitigação
-const LIMITE_REQ_POR_SEGUNDO = 20;  // máximo de requisições permitidas
-const TEMPO_BAN_MS = 10000;         // 10 segundos de bloqueio
-
-function firewall(req, res, next) {
-    const ip = req.ip;
-
-    if (ipsBloqueados.has(ip) && Date.now() < ipsBloqueados.get(ip)) {
-        return res.status(429).send("IP temporariamente bloqueado");
-    }
-
-    const agora = Date.now();
-    const historico = requisicoesPorIp.get(ip) || [];
-    const novoHistorico = historico.filter(ts => agora - ts < 1000);
-    novoHistorico.push(agora);
-    requisicoesPorIp.set(ip, novoHistorico);
-
-    if (novoHistorico.length > LIMITE_REQ_POR_SEGUNDO) {
-        ipsBloqueados.set(ip, agora + TEMPO_BAN_MS);
-        return res.status(429).send("Muitas requisições - IP bloqueado");
-    }
-
-    next();
-}
-
-// 🔹 Usar middleware antes das rotas
-app.use(firewall);
-
-// Serve a pasta cliente
 app.use(express.static("cliente"));
 
-// 🔹 Variável global para cálculo da CPU
-let ultimaMedidaCpu = os.cpus();
+// 🔹 Variáveis de mitigação
+const requisicoesPorIp = new Map();
+const ipsBloqueados = new Map();
+const LIMITE_REQ_POR_SEGUNDO = 20;
+const TEMPO_BAN_MS = 10000;
+let mitigacaoAtiva = true; // 🔥 inicia com firewall ligado
 
-// 🔹 Função para calcular uso da CPU em tempo real
+// 🔹 CPU
+let ultimaMedidaCpu = os.cpus();
 function calcularUsoCpu() {
     const cpusAgora = os.cpus();
     let usoTotal = 0;
@@ -71,7 +41,44 @@ function calcularUsoCpu() {
     return usoTotal / cpusAgora.length;
 }
 
-// 🔹 Endpoint de métricas
+// 🔹 Firewall Middleware
+function firewall(req, res, next) {
+    if (!mitigacaoAtiva) return next();
+
+    const ip = req.ip;
+
+    if (ipsBloqueados.has(ip) && Date.now() < ipsBloqueados.get(ip)) {
+        return res.status(429).send("IP temporariamente bloqueado");
+    }
+
+    const agora = Date.now();
+    const historico = requisicoesPorIp.get(ip) || [];
+    const novoHistorico = historico.filter(ts => agora - ts < 1000);
+    novoHistorico.push(agora);
+    requisicoesPorIp.set(ip, novoHistorico);
+
+    if (novoHistorico.length > LIMITE_REQ_POR_SEGUNDO) {
+        ipsBloqueados.set(ip, agora + TEMPO_BAN_MS);
+        return res.status(429).send("Muitas requisições - IP bloqueado");
+    }
+
+    next();
+}
+
+app.use(firewall);
+
+// 🔹 Rotas para ativar/desativar mitigação
+app.post("/mitigacao/ativar", (req, res) => {
+    mitigacaoAtiva = true;
+    res.send("Mitigação ativada");
+});
+
+app.post("/mitigacao/desativar", (req, res) => {
+    mitigacaoAtiva = false;
+    res.send("Mitigação desativada");
+});
+
+// 🔹 Rota de métricas
 app.get("/stats", (req, res) => {
     const memoriaTotal = os.totalmem();
     const memoriaLivre = os.freemem();
@@ -88,14 +95,15 @@ app.get("/stats", (req, res) => {
     });
 });
 
-
-// 🔹 Conexões Socket.IO (ataques)
+// 🔹 Socket.IO
 io.on("connection", (socket) => {
     const ip = socket.handshake.address;
 
     console.log("Nova conexão:", ip, socket.id);
 
     socket.on("ataque", () => {
+        if (!mitigacaoAtiva) return; // sem mitigação, ignora contagem
+
         const agora = Date.now();
 
         if (ipsBloqueados.has(ip) && Date.now() < ipsBloqueados.get(ip)) {
