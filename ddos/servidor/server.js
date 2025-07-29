@@ -43,6 +43,9 @@ function calcularUsoCpu() {
 
 // 🔹 Firewall Middleware
 function firewall(req, res, next) {
+    // Não aplicar firewall na rota de métricas
+    if (req.path === "/stats") return next();
+
     if (!mitigacaoAtiva) return next();
 
     const ip = req.ip;

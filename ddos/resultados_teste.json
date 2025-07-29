@@ -1,0 +1,24 @@
+[
+  {
+    "mitigacao": false,
+    "resultado": "This is ApacheBench, Version 2.3 <$Revision: 1923142 $>\nCopyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/\nLicensed to The Apache Software Foundation, http://www.apache.org/\n\nBenchmarking localhost (be patient)\n\n\nServer Software:        \nServer Hostname:        localhost\nServer Port:            3000\n\nDocument Path:          /stats\nDocument Length:        61 bytes\n\nConcurrency Level:      100\nTime taken for tests:   3.008 seconds\nComplete requests:      2000\nFailed requests:        1999\n   (Connect: 0, Receive: 0, Length: 1999, Exceptions: 0)\nTotal transferred:      534001 bytes\nHTML transferred:       120001 bytes\nRequests per second:    664.99 [#/sec] (mean)\nTime per request:       150.379 [ms] (mean)\nTime per request:       1.504 [ms] (mean, across all concurrent requests)\nTransfer rate:          173.39 [Kbytes/sec] received\n\nConnection Times (ms)\n              min  mean[+/-sd] median   max\nConnect:        0    0   0.7      0       5\nProcessing:    11  147  32.0    160     192\nWaiting:        6  146  32.3    160     192\nTotal:         11  147  31.7    160     192\n\nPercentage of the requests served within a certain time (ms)\n  50%    160\n  66%    172\n  75%    174\n  80%    178\n  90%    184\n  95%    186\n  98%    189\n  99%    190\n 100%    192 (longest request)\n",
+    "metricaFinal": {
+      "timestamp": 1753813261115,
+      "cpu": "NaN",
+      "memoria": "67.11",
+      "conexoes": 0,
+      "bloqueados": 0
+    }
+  },
+  {
+    "mitigacao": true,
+    "resultado": "This is ApacheBench, Version 2.3 <$Revision: 1923142 $>\nCopyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/\nLicensed to The Apache Software Foundation, http://www.apache.org/\n\nBenchmarking localhost (be patient)\n\n\nServer Software:        \nServer Hostname:        localhost\nServer Port:            3000\n\nDocument Path:          /stats\nDocument Length:        62 bytes\n\nConcurrency Level:      100\nTime taken for tests:   2.272 seconds\nComplete requests:      2000\nFailed requests:        1999\n   (Connect: 0, Receive: 0, Length: 1999, Exceptions: 0)\nTotal transferred:      534002 bytes\nHTML transferred:       120002 bytes\nRequests per second:    880.33 [#/sec] (mean)\nTime per request:       113.594 [ms] (mean)\nTime per request:       1.136 [ms] (mean, across all concurrent requests)\nTransfer rate:          229.54 [Kbytes/sec] received\n\nConnection Times (ms)\n              min  mean[+/-sd] median   max\nConnect:        0    0   0.8      0       4\nProcessing:     5  110  16.2    112     136\nWaiting:        1  109  19.8    112     135\nTotal:          6  111  15.6    112     136\n\nPercentage of the requests served within a certain time (ms)\n  50%    112\n  66%    117\n  75%    121\n  80%    121\n  90%    123\n  95%    126\n  98%    134\n  99%    135\n 100%    136 (longest request)\n",
+    "metricaFinal": {
+      "timestamp": 1753813263405,
+      "cpu": "NaN",
+      "memoria": "67.42",
+      "conexoes": 0,
+      "bloqueados": 0
+    }
+  }
+]
