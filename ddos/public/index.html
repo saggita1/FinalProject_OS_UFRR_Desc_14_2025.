@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DDoS Lab</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Simulador DDoS</h1>
+    <button onclick="iniciarAtaque()">Iniciar ataque</button>
+
+    <h2>Monitoramento do Servidor</h2>
+    <canvas id="cpuChart" width="400" height="100"></canvas>
+    <canvas id="ramChart" width="400" height="100"></canvas>
+    <canvas id="connChart" width="400" height="100"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>

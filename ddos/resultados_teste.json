@@ -1,29 +1,29 @@
 [
   {
     "mitigacao": false,
-    "resultado": "This is ApacheBench, Version 2.3 <$Revision: 1923142 $>\nCopyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/\nLicensed to The Apache Software Foundation, http://www.apache.org/\n\nBenchmarking localhost (be patient)\n\n\nServer Software:        \nServer Hostname:        localhost\nServer Port:            3000\n\nDocument Path:          /ataque\nDocument Length:        2 bytes\n\nConcurrency Level:      100\nTime taken for tests:   1.474 seconds\nComplete requests:      2000\nFailed requests:        0\nTotal transferred:      400000 bytes\nHTML transferred:       4000 bytes\nRequests per second:    1356.61 [#/sec] (mean)\nTime per request:       73.713 [ms] (mean)\nTime per request:       0.737 [ms] (mean, across all concurrent requests)\nTransfer rate:          264.96 [Kbytes/sec] received\n\nConnection Times (ms)\n              min  mean[+/-sd] median   max\nConnect:        0    0   0.6      0       4\nProcessing:     9   72   9.5     71      87\nWaiting:        4   71  10.3     71      87\nTotal:          9   72   9.0     71      87\n\nPercentage of the requests served within a certain time (ms)\n  50%     71\n  66%     75\n  75%     77\n  80%     79\n  90%     81\n  95%     83\n  98%     86\n  99%     87\n 100%     87 (longest request)\n",
+    "resultado": "This is ApacheBench, Version 2.3 <$Revision: 1923142 $>\nCopyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/\nLicensed to The Apache Software Foundation, http://www.apache.org/\n\nBenchmarking localhost (be patient)\n\n\nServer Software:        \nServer Hostname:        localhost\nServer Port:            3000\n\nDocument Path:          /ataque\nDocument Length:        2 bytes\n\nConcurrency Level:      100\nTime taken for tests:   1.421 seconds\nComplete requests:      2000\nFailed requests:        0\nTotal transferred:      400000 bytes\nHTML transferred:       4000 bytes\nRequests per second:    1407.14 [#/sec] (mean)\nTime per request:       71.066 [ms] (mean)\nTime per request:       0.711 [ms] (mean, across all concurrent requests)\nTransfer rate:          274.83 [Kbytes/sec] received\n\nConnection Times (ms)\n              min  mean[+/-sd] median   max\nConnect:        0    0   0.9      0       6\nProcessing:     7   69  11.3     69      89\nWaiting:        2   69  12.1     68      89\nTotal:          8   69  10.8     69      89\n\nPercentage of the requests served within a certain time (ms)\n  50%     69\n  66%     74\n  75%     77\n  80%     79\n  90%     83\n  95%     86\n  98%     87\n  99%     89\n 100%     89 (longest request)\n",
     "falhas": 0,
     "sucesso": 2000,
     "taxaBloqueio": "0.00",
     "metricaFinal": {
-      "timestamp": 1753817830041,
-      "cpu": "10.98",
-      "memoria": "16.29",
-      "conexoes": 0,
+      "timestamp": 1753849757326,
+      "cpu": "20.48",
+      "memoria": "21.14",
+      "conexoes": 1,
       "bloqueados": 0
     }
   },
   {
     "mitigacao": true,
-    "resultado": "This is ApacheBench, Version 2.3 <$Revision: 1923142 $>\nCopyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/\nLicensed to The Apache Software Foundation, http://www.apache.org/\n\nBenchmarking localhost (be patient)\n\n\nServer Software:        \nServer Hostname:        localhost\nServer Port:            3000\n\nDocument Path:          /ataque\nDocument Length:        2 bytes\n\nConcurrency Level:      100\nTime taken for tests:   0.920 seconds\nComplete requests:      2000\nFailed requests:        1980\n   (Connect: 0, Receive: 0, Length: 1980, Exceptions: 0)\nNon-2xx responses:      1980\nTotal transferred:      485144 bytes\nHTML transferred:       55484 bytes\nRequests per second:    2173.89 [#/sec] (mean)\nTime per request:       46.000 [ms] (mean)\nTime per request:       0.460 [ms] (mean, across all concurrent requests)\nTransfer rate:          514.97 [Kbytes/sec] received\n\nConnection Times (ms)\n              min  mean[+/-sd] median   max\nConnect:        0    0   0.9      0       5\nProcessing:     7   45   7.9     45      64\nWaiting:        2   44   8.8     45      64\nTotal:          8   45   7.5     45      64\n\nPercentage of the requests served within a certain time (ms)\n  50%     45\n  66%     47\n  75%     49\n  80%     50\n  90%     56\n  95%     58\n  98%     59\n  99%     61\n 100%     64 (longest request)\n",
+    "resultado": "This is ApacheBench, Version 2.3 <$Revision: 1923142 $>\nCopyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/\nLicensed to The Apache Software Foundation, http://www.apache.org/\n\nBenchmarking localhost (be patient)\n\n\nServer Software:        \nServer Hostname:        localhost\nServer Port:            3000\n\nDocument Path:          /ataque\nDocument Length:        2 bytes\n\nConcurrency Level:      100\nTime taken for tests:   0.907 seconds\nComplete requests:      2000\nFailed requests:        1980\n   (Connect: 0, Receive: 0, Length: 1980, Exceptions: 0)\nNon-2xx responses:      1980\nTotal transferred:      485144 bytes\nHTML transferred:       55484 bytes\nRequests per second:    2205.84 [#/sec] (mean)\nTime per request:       45.334 [ms] (mean)\nTime per request:       0.453 [ms] (mean, across all concurrent requests)\nTransfer rate:          522.53 [Kbytes/sec] received\n\nConnection Times (ms)\n              min  mean[+/-sd] median   max\nConnect:        0    0   1.0      0       5\nProcessing:     6   44   9.1     44      73\nWaiting:        1   43  10.4     44      73\nTotal:          6   44   8.6     44      73\n\nPercentage of the requests served within a certain time (ms)\n  50%     44\n  66%     47\n  75%     48\n  80%     50\n  90%     54\n  95%     57\n  98%     68\n  99%     71\n 100%     73 (longest request)\n",
     "falhas": 1980,
     "sucesso": 20,
     "taxaBloqueio": "99.00",
     "metricaFinal": {
-      "timestamp": 1753817830982,
-      "cpu": "21.83",
-      "memoria": "15.62",
-      "conexoes": 0,
+      "timestamp": 1753849758249,
+      "cpu": "21.80",
+      "memoria": "18.49",
+      "conexoes": 1,
       "bloqueados": 1
     }
   }

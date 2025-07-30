@@ -13,7 +13,13 @@ const bloqueados = new Map();
 const LIMITE_REQ = 20; // req/s
 const BAN_TIME = 10 * 1000; // 10s
 
-// Middleware Firewall
+// Para socket
+const limiteSockets = new Map();
+const bloqueadosSockets = new Map();
+const LIMITE_SOCKET = 20;
+const BAN_TIME_SOCKET = 10 * 1000;
+
+// Middleware Firewall HTTP
 function firewall(req, res, next) {
     const ip = req.ip;
 
@@ -46,7 +52,6 @@ function firewall(req, res, next) {
     next();
 }
 
-// 🔹 Ignora firewall para rotas internas
 app.use((req, res, next) => {
     const rotasIgnoradas = ["/stats", "/mitigacao/ativar", "/mitigacao/desativar"];
     if (rotasIgnoradas.includes(req.path)) {
@@ -57,12 +62,10 @@ app.use((req, res, next) => {
 
 app.use(express.static("public"));
 
-// 🔹 Nova rota para teste de ataque
 app.get("/ataque", (req, res) => {
     res.send("OK");
 });
 
-// 🔹 Monitoramento de CPU
 let ultimaMedidaCpu = os.cpus();
 function calcularUsoCpu() {
     const cpusAgora = os.cpus();
@@ -87,7 +90,6 @@ function calcularUsoCpu() {
     return usoTotal / cpusAgora.length;
 }
 
-// 🔹 Rota de métricas
 app.get("/stats", (req, res) => {
     const memoria = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
     const cpu = calcularUsoCpu().toFixed(2);
@@ -101,7 +103,6 @@ app.get("/stats", (req, res) => {
     });
 });
 
-// 🔹 Ativar/desativar mitigação
 app.post("/mitigacao/ativar", (req, res) => {
     mitigacaoAtiva = true;
     res.send("Mitigação ativada");
@@ -114,11 +115,47 @@ app.post("/mitigacao/desativar", (req, res) => {
     res.send("Mitigação desativada");
 });
 
-// 🔹 Socket.io
 io.on("connection", (socket) => {
     console.log("Cliente conectado:", socket.id);
+
+    socket.on("ataque", () => {
+        if (!mitigacaoAtiva) {
+            console.log(`Ataque recebido do cliente ${socket.id}`);
+            return;
+        }
+
+        if (bloqueadosSockets.has(socket.id)) {
+            if (Date.now() - bloqueadosSockets.get(socket.id) > BAN_TIME_SOCKET) {
+                bloqueadosSockets.delete(socket.id);
+            } else {
+                console.log(`Cliente ${socket.id} bloqueado temporariamente`);
+                return;
+            }
+        }
+
+        const now = Date.now();
+        if (!limiteSockets.has(socket.id)) {
+            limiteSockets.set(socket.id, []);
+        }
+        const timestamps = limiteSockets.get(socket.id);
+        timestamps.push(now);
+        while (timestamps.length > 0 && now - timestamps[0] > 1000) {
+            timestamps.shift();
+        }
+
+        if (timestamps.length > LIMITE_SOCKET) {
+            bloqueadosSockets.set(socket.id, Date.now());
+            console.log(`Cliente ${socket.id} bloqueado por excesso de ataques`);
+            return;
+        }
+
+        console.log(`Ataque recebido do cliente ${socket.id}`);
+    });
+
     socket.on("disconnect", () => {
         console.log("Cliente desconectado:", socket.id);
+        limiteSockets.delete(socket.id);
+        bloqueadosSockets.delete(socket.id);
     });
 });
 
