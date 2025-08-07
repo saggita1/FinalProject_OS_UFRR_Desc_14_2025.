@@ -6,8 +6,8 @@ Sistema educacional para simulação de ataques DDoS (Distributed Denial of Serv
 
 ## Autores
 
-- Ryan Pimentel - UFRR
-- Leonam Sousa - UFRR
+- Ryan Pimentel
+- Leonam Sousa
 
 ## Funcionalidades
 
